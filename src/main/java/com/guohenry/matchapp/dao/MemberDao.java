@@ -1,0 +1,10 @@
+package com.guohenry.matchapp.dao;
+
+import com.guohenry.matchapp.model.Member;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface MemberDao extends JpaRepository<Member, Long> {
+
+    // 檢查 email 是否重複
+    boolean existsByEmail(String email);
+}
