@@ -5,6 +5,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface MemberDao extends JpaRepository<Member, Long> {
 
+
+    Member findByEmail(String email);
+
     // 檢查 email 是否重複
     boolean existsByEmail(String email);
 }

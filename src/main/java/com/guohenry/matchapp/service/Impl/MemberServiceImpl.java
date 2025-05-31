@@ -16,6 +16,19 @@ public class MemberServiceImpl implements MemberService {
 
     private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
+
+    @Override
+    public Member login(String email, String password) {
+
+        Member member = memberDao.findByEmail(email);
+        if(member != null && encoder.matches(password, member.getPassword())) {
+            // 密碼正確，回傳會員資料
+            return member;
+        }
+
+        return null;
+    }
+
     @Override
     public Member register(Member member){
 
