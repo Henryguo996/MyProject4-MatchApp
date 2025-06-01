@@ -7,6 +7,9 @@ import com.guohenry.matchapp.model.Member;
 import com.guohenry.matchapp.service.MemberService;
 import com.guohenry.matchapp.service.RedisService;
 import com.guohenry.matchapp.util.JwtUtil;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -31,6 +34,11 @@ public class MemberController {
 
     // 會員登入，驗證成功則回傳 JWT
     @PostMapping("/login")
+    @Operation(summary = "會員登入", description = "登入成功會回傳 JWT Token")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "登入成功"),
+            @ApiResponse(responseCode = "400", description = "帳號或密碼錯誤")
+    })
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest ){
 
         // 認證帳號與密碼
