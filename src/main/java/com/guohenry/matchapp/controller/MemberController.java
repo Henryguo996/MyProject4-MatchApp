@@ -8,16 +8,17 @@ import com.guohenry.matchapp.service.MemberService;
 import com.guohenry.matchapp.service.RedisService;
 import com.guohenry.matchapp.util.JwtUtil;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/member")
+@Tag(name = "會員 API", description = "會員登入 / 註冊")
 public class MemberController {
 
     @Autowired
@@ -50,19 +51,16 @@ public class MemberController {
 
         // 登入成功，產生 JWT token
         String token = jwtUtil.generateToken(member.getEmail());
-
-        //存入redis,設定1天過期
-//        redisService.save("member:" + member.getEmail(), member, 86400);
-
-        // 清除密碼後儲存至 Redis
-        member.setPassword(null);
+        // 存入 Redis
         redisService.saveMember(member);
+        // 清除密碼
+        member.setPassword(null);
         // 回傳 token 給前端
-        return ResponseEntity.ok().body(token);
+        return ResponseEntity.ok(token);
 
     }
 
-    // 註冊功能
+    @Operation(summary = "會員註冊", description = "提供 name, email, password 進行註冊")
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody @Valid Member member){
 
