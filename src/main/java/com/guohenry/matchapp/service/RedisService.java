@@ -2,6 +2,7 @@ package com.guohenry.matchapp.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.guohenry.matchapp.model.Member;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
@@ -46,5 +47,31 @@ public class RedisService {
         redisTemplate.delete(key);
     }
 
+    public void saveMember(Member member){
+        try{
+            // Key 前綴
+           String key = "login:" + member.getEmail();
+            // 序列化成 JSON 字串
+           String value = objectMapper.writeValueAsString(member);
+           redisTemplate.opsForValue().set(key, value, Duration.ofHours(24)); //存入有效限時24h
+
+        }catch (JsonProcessingException e){
+            e.printStackTrace();
+        }
+    }
+
+    // 從 Redis 讀取會員資料
+    public Member getMember(String email){
+        try{
+           String key = "login:" + email;
+           String json = redisTemplate.opsForValue().get(key);
+           if(json != null){
+               return objectMapper.readValue(json, Member.class);
+           }
+        }catch (JsonProcessingException e){
+            e.printStackTrace();
+        }
+        return null;
+    }
 
 }

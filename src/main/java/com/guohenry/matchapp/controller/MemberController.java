@@ -52,10 +52,11 @@ public class MemberController {
         String token = jwtUtil.generateToken(member.getEmail());
 
         //存入redis,設定1天過期
-        redisService.save("member:" + member.getEmail(), member, 86400);
+//        redisService.save("member:" + member.getEmail(), member, 86400);
 
-        // 不回傳密碼給前端
+        // 清除密碼後儲存至 Redis
         member.setPassword(null);
+        redisService.saveMember(member);
         // 回傳 token 給前端
         return ResponseEntity.ok().body(token);
 
@@ -71,6 +72,26 @@ public class MemberController {
 
         Member saved = memberService.register(member);
         return ResponseEntity.ok(saved);
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<?> getCurrenMember(@RequestHeader("Authorization") String authHeader){
+        // 確認 Authorization 開頭是 Bearer
+        if(!authHeader.startsWith("Bearer ")){
+            return ResponseEntity.status(401).body("無效的授權");
+        }
+        // 擷取 JWT token
+        String token = authHeader.substring(7);
+        // 解析出 email（subject）
+        String email = jwtUtil.extractEmail(token);
+        // 從 Redis 拿取該 email 對應的會員資訊
+        Member member = redisService.getMember(email);
+
+        if(member == null){
+            return ResponseEntity.status(401).body("找不到會員資料");
+        }
+
+        return ResponseEntity.ok(member);
     }
 
 }
