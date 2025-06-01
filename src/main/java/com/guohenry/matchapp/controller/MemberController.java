@@ -5,6 +5,7 @@ import com.guohenry.matchapp.dao.MemberDao;
 import com.guohenry.matchapp.dto.LoginRequest;
 import com.guohenry.matchapp.model.Member;
 import com.guohenry.matchapp.service.MemberService;
+import com.guohenry.matchapp.service.RedisService;
 import com.guohenry.matchapp.util.JwtUtil;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,9 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/member")
 public class MemberController {
+
+    @Autowired
+    private RedisService redisService;
 
     @Autowired
     private JwtUtil jwtUtil;
@@ -38,6 +42,9 @@ public class MemberController {
 
         // 登入成功，產生 JWT token
         String token = jwtUtil.generateToken(member.getEmail());
+
+        //存入redis,設定1天過期
+        redisService.save("member:" + member.getEmail(), member, 86400);
 
         // 不回傳密碼給前端
         member.setPassword(null);
