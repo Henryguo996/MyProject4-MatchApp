@@ -4,7 +4,7 @@ import com.guohenry.matchapp.model.Member;
 
 public interface MemberService {
 
-    Member login(String emial, String password);
+    Member login(String email, String password);
 
     Member register(Member member);
 }

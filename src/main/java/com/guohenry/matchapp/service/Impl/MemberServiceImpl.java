@@ -21,6 +21,7 @@ public class MemberServiceImpl implements MemberService {
     public Member login(String email, String password) {
 
         Member member = memberDao.findByEmail(email);
+
         if(member != null && encoder.matches(password, member.getPassword())) {
             // 密碼正確，回傳會員資料
             return member;
